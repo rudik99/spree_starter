@@ -92,6 +92,9 @@ gem 'sidekiq'
 # AWS SES API for email delivery (bypasses SMTP port restrictions)
 gem 'aws-sdk-sesv2'
 
+# AWS S3 SDK for file storage (Cloudflare R2 compatibility)
+gem 'aws-sdk-s3'
+
 # Use Devise for authentication
 gem "devise"
 
