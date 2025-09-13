@@ -87,11 +87,13 @@ Rails.application.configure do
     config.action_mailer.perform_deliveries = true
     config.action_mailer.raise_delivery_errors = true
     
-    config.action_mailer.aws_ses_delivery_method_settings = {
+    # Register the delivery method with ActionMailer
+    ActionMailer::Base.add_delivery_method :aws_ses, AwsSesDeliveryMethod, {
       region: ENV.fetch('AWS_REGION', 'ap-southeast-2'),
       access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
     }
+    config.action_mailer.delivery_method = :aws_ses
   elsif ENV['SMTP_ADDRESS'].present?
     # Fallback to SMTP (may not work on Railway due to port restrictions)
     config.action_mailer.delivery_method = :smtp
