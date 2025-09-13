@@ -698,21 +698,49 @@ CLOUDFLARE_BUCKET=your-bucket-name
    - Create token with "Object Read and Write" permissions
    - Note the Access Key ID and Secret Access Key
 
-3. **Configure Public Access** (optional):
+3. **Configure CORS Policy** (Required for uploads):
+   - Go to your R2 bucket > Settings tab
+   - Click "Add CORS policy"
+   - Add this configuration:
+   ```json
+   [
+     {
+       "AllowedOrigins": [
+         "https://your-domain.up.railway.app",
+         "http://localhost:3000"
+       ],
+       "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+       "AllowedHeaders": ["*"],
+       "ExposeHeaders": ["ETag", "x-amz-meta-*"],
+       "MaxAgeSeconds": 3600
+     }
+   ]
+   ```
+   - Replace `https://your-domain.up.railway.app` with your actual Railway domain
+
+4. **Configure Public Access** (optional):
    - For public product images, configure custom domain or public bucket access
    - Set up Cloudflare Transform Rules for image optimization if needed
 
-4. **Set Environment Variables**:
+5. **Set Environment Variables**:
    - Use your Account ID in the endpoint URL
    - The endpoint format is: `https://[account-id].r2.cloudflarestorage.com`
 
 ### Local Development
 Local development uses local file storage. R2 is only used when `CLOUDFLARE_ENDPOINT` environment variable is present.
 
+### Testing R2 Configuration
+Test your R2 setup with the included rake task:
+```bash
+# Test R2 connectivity and upload functionality
+bin/rails r2:test
+```
+
 ### Benefits of R2
 - **Cost-effective**: No egress fees
 - **Fast**: Global CDN distribution
 - **S3-compatible**: Works with existing Rails Active Storage
 - **Reliable**: Cloudflare's global infrastructure
+- **Direct uploads**: Files upload directly from browser to R2, reducing server load
 
 - prioritise using out of the box rather than building from scratch

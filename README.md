@@ -78,7 +78,14 @@ CLOUDFLARE_SECRET_ACCESS_KEY=your-r2-secret-access-key
 CLOUDFLARE_BUCKET=your-bucket-name
 ```
 
-If R2 variables are not set, the application uses local file storage. See [CLAUDE.md File Storage Configuration](./CLAUDE.md#file-storage-configuration) for detailed R2 setup instructions.
+If R2 variables are not set, the application uses local file storage. 
+
+**Important**: After setting environment variables, you must configure CORS on your R2 bucket to allow browser uploads. See [CLAUDE.md File Storage Configuration](./CLAUDE.md#file-storage-configuration) for complete setup instructions including CORS configuration.
+
+**Test your R2 setup:**
+```bash
+bin/rails r2:test
+```
 
 ## Customizing
 
