@@ -633,6 +633,17 @@ Set these environment variables in your Railway project dashboard under the Vari
 ### Development Email
 Development uses Letter Opener - emails open in browser instead of being sent.
 
+### Testing Email Configuration
+Use the built-in Spree email test task:
+```bash
+EMAIL=your-test-email@example.com bin/rails email:test
+```
+
+This will send a test email using your configured SMTP settings. Common issues:
+- `Net::OpenTimeout` - SMTP server unreachable or wrong address
+- `Authentication failed` - Wrong SMTP username/password  
+- `Permission denied` - Email address not verified with provider (AWS SES, etc.)
+
 ## Email "From" Address Configuration
 
 The default "from" email address can be set in multiple ways:
@@ -652,3 +663,4 @@ This sets the default from address at the Action Mailer level in `config/environ
 Individual mailers can override the from address in their templates or service classes.
 
 **Note**: Ensure your SMTP provider allows sending from the configured email address.
+- prioritise using out of the box rather than building from scratch
