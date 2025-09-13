@@ -89,6 +89,9 @@ end
 # Use Sidekiq for background jobs
 gem 'sidekiq'
 
+# AWS SES API for email delivery (bypasses SMTP port restrictions)
+gem 'aws-sdk-sesv2'
+
 # Use Devise for authentication
 gem "devise"
 

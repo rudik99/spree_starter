@@ -79,8 +79,21 @@ Rails.application.configure do
     from: ENV.fetch('SPREE_MAIL_FROM', 'noreply@example.com')
   }
 
-  # Configure SMTP settings using environment variables
-  if ENV['SMTP_ADDRESS'].present?
+  # Configure email delivery method
+  if ENV['AWS_ACCESS_KEY_ID'].present? && ENV['AWS_SECRET_ACCESS_KEY'].present?
+    # Use AWS SES API (bypasses SMTP port restrictions)
+    require_relative '../../lib/aws_ses_delivery_method'
+    config.action_mailer.delivery_method = AwsSesDeliveryMethod
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.raise_delivery_errors = true
+    
+    config.action_mailer.aws_ses_delivery_method_settings = {
+      region: ENV.fetch('AWS_REGION', 'ap-southeast-2'),
+      access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+    }
+  elsif ENV['SMTP_ADDRESS'].present?
+    # Fallback to SMTP (may not work on Railway due to port restrictions)
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.perform_deliveries = true
     config.action_mailer.raise_delivery_errors = true
