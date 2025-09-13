@@ -16,10 +16,6 @@ Spree.config do |config|
   # Example:
   # Uncomment to stop tracking inventory levels in the application
   # config.track_inventory_levels = false
-  
-  # Configure default "from" email address for all Spree emails
-  # This can be overridden in Admin > Configuration > Mail Method Settings
-  config.mails_from = ENV.fetch('SPREE_MAIL_FROM', 'noreply@example.com')
 end
 
 # Background job queue names

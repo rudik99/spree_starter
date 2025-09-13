@@ -73,6 +73,11 @@ Rails.application.configure do
     host: ENV.fetch('MAILER_DEFAULT_HOST', 'localhost'),
     protocol: ENV.fetch('MAILER_DEFAULT_PROTOCOL', 'https')
   }
+  
+  # Set default from address for Action Mailer
+  config.action_mailer.default_options = {
+    from: ENV.fetch('SPREE_MAIL_FROM', 'noreply@example.com')
+  }
 
   # Configure SMTP settings using environment variables
   if ENV['SMTP_ADDRESS'].present?

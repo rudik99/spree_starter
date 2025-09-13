@@ -641,11 +641,12 @@ The default "from" email address can be set in multiple ways:
 ```bash
 SPREE_MAIL_FROM=noreply@yourdomain.com
 ```
+This sets the default from address at the Action Mailer level in `config/environments/production.rb`.
 
 ### 2. Admin Interface
 - Go to Admin Dashboard > Configuration > Mail Method Settings
 - Set the "Mails From" field
-- This overrides the environment variable setting
+- Individual mailers may still use the Action Mailer default
 
 ### 3. Per-Email Basis
 Individual mailers can override the from address in their templates or service classes.
