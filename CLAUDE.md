@@ -600,20 +600,25 @@ The application is configured to use SMTP for email delivery in production. Conf
 SMTP_ADDRESS=smtp.your-provider.com
 SMTP_USERNAME=your-smtp-username  
 SMTP_PASSWORD=your-smtp-password
+SPREE_MAIL_FROM=noreply@yourdomain.com    # Default "from" address for all emails
+```
+
+```bash
+# Required: Your domain (used for email links and SMTP identification)
+MAILER_DEFAULT_HOST=yourdomain.com
 ```
 
 ### Optional Environment Variables (with defaults)
 ```bash
 SMTP_PORT=587                          # Default: 587
-SMTP_DOMAIN=yourdomain.com            # Default: app host
+SMTP_DOMAIN=mail.yourdomain.com       # Default: uses MAILER_DEFAULT_HOST
 SMTP_AUTHENTICATION=plain             # Default: plain
 SMTP_ENABLE_STARTTLS_AUTO=true        # Default: true
 SMTP_OPENSSL_VERIFY_MODE=peer         # Default: peer
-
-# Mailer URL configuration
-MAILER_DEFAULT_HOST=yourdomain.com    # Default: localhost
 MAILER_DEFAULT_PROTOCOL=https         # Default: https
 ```
+
+**Note**: `SMTP_DOMAIN` is optional and defaults to `MAILER_DEFAULT_HOST`. Only set it separately if your mail server uses a different subdomain.
 
 ### Popular SMTP Providers
 See `.env.example` file for configuration examples for:
@@ -627,3 +632,22 @@ Set these environment variables in your Railway project dashboard under the Vari
 
 ### Development Email
 Development uses Letter Opener - emails open in browser instead of being sent.
+
+## Email "From" Address Configuration
+
+The default "from" email address can be set in multiple ways:
+
+### 1. Environment Variable (Recommended)
+```bash
+SPREE_MAIL_FROM=noreply@yourdomain.com
+```
+
+### 2. Admin Interface
+- Go to Admin Dashboard > Configuration > Mail Method Settings
+- Set the "Mails From" field
+- This overrides the environment variable setting
+
+### 3. Per-Email Basis
+Individual mailers can override the from address in their templates or service classes.
+
+**Note**: Ensure your SMTP provider allows sending from the configured email address.

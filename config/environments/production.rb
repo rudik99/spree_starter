@@ -80,10 +80,13 @@ Rails.application.configure do
     config.action_mailer.perform_deliveries = true
     config.action_mailer.raise_delivery_errors = true
     
+    # Use MAILER_DEFAULT_HOST as fallback for SMTP_DOMAIN if not specified
+    smtp_domain = ENV.fetch('SMTP_DOMAIN', ENV.fetch('MAILER_DEFAULT_HOST', 'localhost'))
+    
     config.action_mailer.smtp_settings = {
       address: ENV['SMTP_ADDRESS'],
       port: ENV.fetch('SMTP_PORT', 587).to_i,
-      domain: ENV.fetch('SMTP_DOMAIN', Rails.application.routes.default_url_options[:host]),
+      domain: smtp_domain,
       user_name: ENV['SMTP_USERNAME'],
       password: ENV['SMTP_PASSWORD'],
       authentication: ENV.fetch('SMTP_AUTHENTICATION', 'plain').to_sym,
