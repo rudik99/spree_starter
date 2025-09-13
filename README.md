@@ -15,6 +15,7 @@ This starter uses:
 * PostgreSQL as a database
 * Redis for caching
 * AWS SES API for reliable email delivery (bypasses SMTP port restrictions)
+* Cloudflare R2 for file storage (product images, uploads)
 * (Optional) [Sentry](https://sentry.io) for error/performance monitoring
 
 You don't need to install additional tools or libraries to start developing with Spree Starter. Everything is already set up for you.
@@ -29,14 +30,27 @@ Please follow [Spree Quickstart guide](https://spreecommerce.org/docs/developer/
 
 ## Deployment
 
-Please follow [Deployment guide](https://spreecommerce.org/docs/developer/deployment/render) to quickly deploy your production-ready Spree application.
+This starter is configured for multiple deployment platforms. See [CLAUDE.md Deployment section](./CLAUDE.md#deployment--infrastructure) for platform-specific instructions.
+
+### Railway.com (Recommended)
+
+Railway deployment requires **two separate services**:
+
+1. **Web Service** - Runs the Rails application
+2. **Worker Service** - Runs Sidekiq for background jobs (required for admin invitations and order confirmations)
+
+**Important**: Configure services through Railway dashboard, **not** railway.toml file.
+
+#### Railway Setup Steps:
+1. Deploy web service with start command: `bundle exec puma -C config/puma.rb`
+2. Create worker service from same repo with start command: `bundle exec sidekiq`
+3. Copy all environment variables between services
 
 ### Email Configuration
 
-This starter uses AWS SES API for email delivery, which works reliably on all hosting platforms (including Railway, Render, Heroku) by bypassing SMTP port restrictions. 
+This starter uses **AWS SES API** for email delivery, which works reliably on all hosting platforms by bypassing SMTP port restrictions.
 
-Set these environment variables in your deployment:
-
+**Required environment variables:**
 ```bash
 AWS_ACCESS_KEY_ID=your-aws-access-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret-key
@@ -45,7 +59,26 @@ SPREE_MAIL_FROM=noreply@yourdomain.com      # Your "from" email address
 MAILER_DEFAULT_HOST=yourdomain.com          # Your domain for email links
 ```
 
+**Test email delivery:**
+```bash
+EMAIL=your-test-email@example.com bin/rails email:test
+```
+
 See [CLAUDE.md Email Configuration](./CLAUDE.md#email-configuration) for detailed setup instructions and AWS SES requirements.
+
+### File Storage Configuration
+
+This starter supports **Cloudflare R2** for storing product images and file uploads:
+
+**Optional R2 environment variables:**
+```bash
+CLOUDFLARE_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+CLOUDFLARE_ACCESS_KEY_ID=your-r2-access-key-id
+CLOUDFLARE_SECRET_ACCESS_KEY=your-r2-secret-access-key
+CLOUDFLARE_BUCKET=your-bucket-name
+```
+
+If R2 variables are not set, the application uses local file storage. See [CLAUDE.md File Storage Configuration](./CLAUDE.md#file-storage-configuration) for detailed R2 setup instructions.
 
 ## Customizing
 

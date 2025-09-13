@@ -504,7 +504,23 @@ This Spree Starter application includes the following key dependencies:
 ## Supported Platforms
 This application is pre-configured for multiple deployment platforms:
 
-### Render.com (Primary)
+### Railway.com (Primary)
+- Automatic deployments from Git commits
+- **Requires separate web and worker services for background jobs**
+- Configure through Railway dashboard (avoid railway.toml which can override start commands)
+
+#### Railway Service Setup
+1. **Web Service**:
+   - Start Command: `bundle exec puma -C config/puma.rb`
+   - Environment variables: `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY_BASE`, AWS SES variables
+
+2. **Worker Service** (Required for background jobs):
+   - Same repository and branch as web service
+   - Start Command: `bundle exec sidekiq`
+   - Environment variables: Same as web service (especially `DATABASE_URL`, `REDIS_URL`)
+   - Service type: Worker (not Web)
+
+### Render.com
 - Configuration: `render.yaml`
 - Includes web service, worker service, and PostgreSQL database
 - Automatic builds from Git commits
@@ -553,6 +569,8 @@ SpreeStarter::Application
 - **Sidekiq** processes jobs from Redis queues
 - Web UI available at `/sidekiq` in development
 - Jobs should be placed in `app/jobs/` directory
+- **Production**: Requires separate worker service/dyno to process background jobs
+- **Critical emails** like admin invitations and order confirmations use background jobs
 
 ## Asset Compilation
 - **Admin Interface**: Dart Sass compilation (`bin/rails dartsass:watch`)
@@ -655,4 +673,46 @@ This sets the default from address at the Action Mailer level in `config/environ
 Individual mailers can override the from address in their templates or service classes.
 
 **Note**: Ensure your SMTP provider allows sending from the configured email address.
+
+# File Storage Configuration
+
+## Cloudflare R2 (Recommended)
+
+The application is configured to use Cloudflare R2 for file storage (product images, attachments, etc.) when R2 environment variables are present.
+
+### Required Environment Variables
+```bash
+CLOUDFLARE_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+CLOUDFLARE_ACCESS_KEY_ID=your-r2-access-key-id
+CLOUDFLARE_SECRET_ACCESS_KEY=your-r2-secret-access-key
+CLOUDFLARE_BUCKET=your-bucket-name
+```
+
+### Cloudflare R2 Setup Steps
+1. **Create R2 Bucket**:
+   - Go to Cloudflare Dashboard > R2 Object Storage
+   - Create a new bucket (e.g., `spree-production`)
+
+2. **Create R2 API Token**:
+   - Go to R2 > Manage R2 API Tokens
+   - Create token with "Object Read and Write" permissions
+   - Note the Access Key ID and Secret Access Key
+
+3. **Configure Public Access** (optional):
+   - For public product images, configure custom domain or public bucket access
+   - Set up Cloudflare Transform Rules for image optimization if needed
+
+4. **Set Environment Variables**:
+   - Use your Account ID in the endpoint URL
+   - The endpoint format is: `https://[account-id].r2.cloudflarestorage.com`
+
+### Local Development
+Local development uses local file storage. R2 is only used when `CLOUDFLARE_ENDPOINT` environment variable is present.
+
+### Benefits of R2
+- **Cost-effective**: No egress fees
+- **Fast**: Global CDN distribution
+- **S3-compatible**: Works with existing Rails Active Storage
+- **Reliable**: Cloudflare's global infrastructure
+
 - prioritise using out of the box rather than building from scratch
