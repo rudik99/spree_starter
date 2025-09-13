@@ -69,18 +69,26 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  # config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { 
+    host: ENV.fetch('MAILER_DEFAULT_HOST', 'localhost'),
+    protocol: ENV.fetch('MAILER_DEFAULT_PROTOCOL', 'https')
+  }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  if ENV['SENDGRID_API_KEY'].present?
+  # Configure SMTP settings using environment variables
+  if ENV['SMTP_ADDRESS'].present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.raise_delivery_errors = true
+    
     config.action_mailer.smtp_settings = {
-      user_name: 'apikey', # This is the string literal 'apikey', NOT the ID of your API key
-      password: ENV['SENDGRID_API_KEY'], # This is the secret sendgrid API key which was issued during API key creation
-      domain: ENV.fetch('SENDGRID_DOMAIN', Rails.application.routes.default_url_options[:host]),
-      address: 'smtp.sendgrid.net',
-      port: 587,
-      authentication: :plain,
-      enable_starttls_auto: true
+      address: ENV['SMTP_ADDRESS'],
+      port: ENV.fetch('SMTP_PORT', 587).to_i,
+      domain: ENV.fetch('SMTP_DOMAIN', Rails.application.routes.default_url_options[:host]),
+      user_name: ENV['SMTP_USERNAME'],
+      password: ENV['SMTP_PASSWORD'],
+      authentication: ENV.fetch('SMTP_AUTHENTICATION', 'plain').to_sym,
+      enable_starttls_auto: ENV.fetch('SMTP_ENABLE_STARTTLS_AUTO', 'true') == 'true',
+      openssl_verify_mode: ENV.fetch('SMTP_OPENSSL_VERIFY_MODE', 'peer')
     }
   end
 
