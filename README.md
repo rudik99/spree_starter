@@ -14,8 +14,8 @@ This starter uses:
 * [Sidekiq](https://github.com/mperham/sidekiq) for background jobs
 * PostgreSQL as a database
 * Redis for caching
+* AWS SES API for reliable email delivery (bypasses SMTP port restrictions)
 * (Optional) [Sentry](https://sentry.io) for error/performance monitoring
-* (Optional) [SendGrid](https://sendgrid.com) for transactional email notifications
 
 You don't need to install additional tools or libraries to start developing with Spree Starter. Everything is already set up for you.
 
@@ -30,6 +30,22 @@ Please follow [Spree Quickstart guide](https://spreecommerce.org/docs/developer/
 ## Deployment
 
 Please follow [Deployment guide](https://spreecommerce.org/docs/developer/deployment/render) to quickly deploy your production-ready Spree application.
+
+### Email Configuration
+
+This starter uses AWS SES API for email delivery, which works reliably on all hosting platforms (including Railway, Render, Heroku) by bypassing SMTP port restrictions. 
+
+Set these environment variables in your deployment:
+
+```bash
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=ap-southeast-2                    # Your AWS SES region
+SPREE_MAIL_FROM=noreply@yourdomain.com      # Your "from" email address
+MAILER_DEFAULT_HOST=yourdomain.com          # Your domain for email links
+```
+
+See [CLAUDE.md Email Configuration](./CLAUDE.md#email-configuration) for detailed setup instructions and AWS SES requirements.
 
 ## Customizing
 

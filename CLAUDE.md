@@ -592,43 +592,34 @@ Always refer to the official documentation first, then use the Context7 search f
 
 # Email Configuration
 
-## SMTP Setup
-The application is configured to use SMTP for email delivery in production. Configure using environment variables:
+## AWS SES API (Recommended)
+The application is configured to use AWS SES API for email delivery in production. This bypasses SMTP port restrictions common on hosting platforms like Railway.
 
 ### Required Environment Variables
 ```bash
-SMTP_ADDRESS=smtp.your-provider.com
-SMTP_USERNAME=your-smtp-username  
-SMTP_PASSWORD=your-smtp-password
-SPREE_MAIL_FROM=noreply@yourdomain.com    # Default "from" address for all emails
-```
-
-```bash
-# Required: Your domain (used for email links and SMTP identification)
-MAILER_DEFAULT_HOST=yourdomain.com
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=ap-southeast-2                    # Your AWS SES region
+SPREE_MAIL_FROM=noreply@yourdomain.com      # Default "from" address for all emails
+MAILER_DEFAULT_HOST=yourdomain.com          # Your domain for email links
 ```
 
 ### Optional Environment Variables (with defaults)
 ```bash
-SMTP_PORT=587                          # Default: 587
-SMTP_DOMAIN=mail.yourdomain.com       # Default: uses MAILER_DEFAULT_HOST
-SMTP_AUTHENTICATION=plain             # Default: plain
-SMTP_ENABLE_STARTTLS_AUTO=true        # Default: true
-SMTP_OPENSSL_VERIFY_MODE=peer         # Default: peer
-MAILER_DEFAULT_PROTOCOL=https         # Default: https
+MAILER_DEFAULT_PROTOCOL=https               # Default: https
 ```
 
-**Note**: `SMTP_DOMAIN` is optional and defaults to `MAILER_DEFAULT_HOST`. Only set it separately if your mail server uses a different subdomain.
+### AWS SES Setup Requirements
+1. **Verify your domain** in AWS SES console
+2. **Verify your "from" email address** (e.g., help@yourdomain.com)
+3. **Move out of sandbox mode** for production sending to unverified emails
+4. **Create SMTP credentials** in AWS SES console for the access keys
 
-### Popular SMTP Providers
-See `.env.example` file for configuration examples for:
-- Gmail (smtp.gmail.com)
-- Outlook (smtp-mail.outlook.com) 
-- AWS SES (email-smtp.region.amazonaws.com)
-- Mailgun (smtp.mailgun.org)
+## SMTP Fallback
+If AWS credentials are not provided, the application falls back to SMTP. Note: Many hosting platforms (including Railway) block SMTP ports, making this less reliable.
 
 ### Railway.app Deployment
-Set these environment variables in your Railway project dashboard under the Variables tab.
+Set the AWS environment variables in your Railway project dashboard under the Variables tab.
 
 ### Development Email
 Development uses Letter Opener - emails open in browser instead of being sent.
@@ -639,10 +630,11 @@ Use the built-in Spree email test task:
 EMAIL=your-test-email@example.com bin/rails email:test
 ```
 
-This will send a test email using your configured SMTP settings. Common issues:
-- `Net::OpenTimeout` - SMTP server unreachable or wrong address
-- `Authentication failed` - Wrong SMTP username/password  
-- `Permission denied` - Email address not verified with provider (AWS SES, etc.)
+This will send a test email using your configured email delivery method. Common issues:
+- AWS SES: `Permission denied` - Email address not verified with provider
+- AWS SES: `MessageRejected` - Still in sandbox mode or unverified domain
+- SMTP: `Net::OpenTimeout` - SMTP server unreachable or ports blocked
+- SMTP: `Authentication failed` - Wrong SMTP username/password
 
 ## Email "From" Address Configuration
 
