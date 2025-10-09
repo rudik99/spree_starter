@@ -40,5 +40,8 @@ cloudflare:
   secret_access_key: <%= ENV.fetch("CLOUDFLARE_SECRET_ACCESS_KEY", "") %>
   region: auto
   bucket: <%= ENV.fetch("CLOUDFLARE_BUCKET", "spree-#{Rails.env}") %>
+  public: true
+  # Custom domain for serving files directly from R2
+  url: <%= ENV["CLOUDFLARE_PUBLIC_URL"] if ENV["CLOUDFLARE_PUBLIC_URL"].present? %>
   request_checksum_calculation: "when_required"
   response_checksum_validation: "when_required"
