@@ -27,7 +27,7 @@ end
 # Use a CDN host for images, eg. Cloudfront
 # This is used in the frontend to generate absolute URLs to images
 # Default is nil and your application host will be used
-# Spree.cdn_host = 'cdn.example.com'
+Spree.cdn_host = ENV['CLOUDFLARE_PUBLIC_URL']&.sub('https://', '') if ENV['CLOUDFLARE_PUBLIC_URL'].present?
 
 # Use a different service for storage (S3, google, etc)
 # unless Rails.env.test?
