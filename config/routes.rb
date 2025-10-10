@@ -1,8 +1,48 @@
 require "sidekiq/web" # require the web UI
 
 Rails.application.routes.draw do
+  Spree::Core::Engine.add_routes do
+    # Storefront routes
+    scope '(:locale)', locale: /#{Spree.available_locales.join('|')}/, defaults: { locale: nil } do
+      devise_for(
+        Spree.user_class.model_name.singular_route_key,
+        class_name: Spree.user_class.to_s,
+        path: :user,
+        controllers: {
+          sessions: 'spree/user_sessions',
+          passwords: 'spree/user_passwords',
+          registrations: 'spree/user_registrations'
+        },
+        router_name: :spree
+      )
+    end
+
+    # Admin authentication
+    devise_for(
+      Spree.admin_user_class.model_name.singular_route_key,
+      class_name: Spree.admin_user_class.to_s,
+      controllers: {
+        sessions: 'spree/admin/user_sessions',
+        passwords: 'spree/admin/user_passwords'
+      },
+      skip: :registrations,
+      path: :admin_user,
+      router_name: :spree
+    )
+  end
+  # This line mounts Spree's routes at the root of your application.
+  # This means, any requests to URLs such as /products, will go to
+  # Spree::ProductsController.
+  # If you would like to change where this engine is mounted, simply change the
+  # :at option to something different.
+  #
+  # We ask that you don't use the :as option here, as Spree relies on it being
+  # the default of "spree".
+  mount Spree::Core::Engine, at: '/'
+
   # Override Spree's cdn_image direct route to use redirect instead of proxy
-  # This serves images directly from R2 instead of proxying through Rails
+  # IMPORTANT: This must be defined AFTER mounting Spree::Core::Engine
+  # because Spree also defines this route and would override our definition
   direct :cdn_image do |model, options|
     opts = options.slice(:protocol, :host, :port)
     opts[:host] = Spree.cdn_host if Spree.cdn_host.present?
@@ -42,46 +82,6 @@ Rails.application.routes.draw do
       )
     end
   end
-
-
-  Spree::Core::Engine.add_routes do
-    # Storefront routes
-    scope '(:locale)', locale: /#{Spree.available_locales.join('|')}/, defaults: { locale: nil } do
-      devise_for(
-        Spree.user_class.model_name.singular_route_key,
-        class_name: Spree.user_class.to_s,
-        path: :user,
-        controllers: {
-          sessions: 'spree/user_sessions',
-          passwords: 'spree/user_passwords',
-          registrations: 'spree/user_registrations'
-        },
-        router_name: :spree
-      )
-    end
-
-    # Admin authentication
-    devise_for(
-      Spree.admin_user_class.model_name.singular_route_key,
-      class_name: Spree.admin_user_class.to_s,
-      controllers: {
-        sessions: 'spree/admin/user_sessions',
-        passwords: 'spree/admin/user_passwords'
-      },
-      skip: :registrations,
-      path: :admin_user,
-      router_name: :spree
-    )
-  end
-  # This line mounts Spree's routes at the root of your application.
-  # This means, any requests to URLs such as /products, will go to
-  # Spree::ProductsController.
-  # If you would like to change where this engine is mounted, simply change the
-  # :at option to something different.
-  #
-  # We ask that you don't use the :as option here, as Spree relies on it being
-  # the default of "spree".
-  mount Spree::Core::Engine, at: '/'
 
   mount Sidekiq::Web => "/sidekiq" # access it at http://localhost:3000/sidekiq
 
