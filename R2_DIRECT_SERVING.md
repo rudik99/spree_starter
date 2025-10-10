@@ -22,7 +22,7 @@ This change means:
 
 ### 2. Storage Configuration (`config/storage.yml`)
 
-Added optional public URL support for even faster serving.
+Set `public: true` for R2 bucket configuration to allow public access.
 
 ## Setup Options
 
@@ -44,7 +44,7 @@ Added optional public URL support for even faster serving.
 
 **Status:** ✅ Already configured and working
 
-### Option B: Public URLs (Fastest - Requires R2 Public Domain Setup)
+### Option B: Public URLs via Custom Domain (Future Enhancement)
 
 **What happens:**
 1. User requests image
@@ -60,7 +60,9 @@ Added optional public URL support for even faster serving.
 - Requires setting up R2 public domain
 - Files are publicly accessible (usually fine for product images)
 
-## Setting Up Option B (Public URLs)
+## Setting Up Option B (Public URLs) - Advanced Configuration
+
+**Note:** This feature requires additional Rails configuration beyond storage.yml. The steps below outline the R2 setup, but additional application-level changes are needed to utilize custom public domains.
 
 ### Step 1: Enable R2 Public Access
 
@@ -88,19 +90,9 @@ You have two options:
 3. Cloudflare will automatically configure DNS
 4. Your public URL will be: `https://cdn.yourdomain.com`
 
-### Step 3: Update Environment Variables
+### Step 3: Configure Rails Asset Host (Future Enhancement)
 
-Add the R2 public URL to your Railway environment variables:
-
-```bash
-# For R2.dev domain:
-CLOUDFLARE_PUBLIC_URL=https://pub-xxxxxxxxxxxxx.r2.dev
-
-# For custom domain:
-CLOUDFLARE_PUBLIC_URL=https://cdn.yourdomain.com
-```
-
-**Important:** Do NOT include a trailing slash!
+To use custom public domains, you would need to configure `config.asset_host` or implement a custom Active Storage service. This is not currently implemented in the default configuration.
 
 ### Step 4: Update CORS Configuration (if not already done)
 
