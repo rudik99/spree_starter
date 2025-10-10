@@ -4,7 +4,7 @@ This guide explains how to serve images directly from R2 instead of proxying thr
 
 ## What Changed
 
-### 1. Active Storage Configuration (`config/initializers/active_storage.rb`)
+### 1. Active Storage Configuration (`config/environments/production.rb`)
 
 Changed from `:rails_storage_proxy` to `:rails_storage_redirect`:
 
@@ -15,6 +15,8 @@ Rails.application.config.active_storage.resolve_model_to_route = :rails_storage_
 # After (fast - redirects to R2):
 Rails.application.config.active_storage.resolve_model_to_route = :rails_storage_redirect
 ```
+
+**Note:** This configuration is placed in `production.rb` instead of an initializer to ensure it's loaded early in the boot process.
 
 This change means:
 - **Before**: User → Rails → R2 → Rails → User (double hop, uses Railway bandwidth)
