@@ -43,9 +43,3 @@ cloudflare:
   public: true
   request_checksum_calculation: "when_required"
   response_checksum_validation: "when_required"
-  # Optional: Set public URL for direct serving from R2
-  # If set, images will be served directly from R2 public domain instead of signed URLs
-  # Example: https://pub-xxx.r2.dev or https://cdn.yourdomain.com
-  <% if ENV.fetch("CLOUDFLARE_PUBLIC_URL", nil).present? %>
-  url: <%= ENV.fetch("CLOUDFLARE_PUBLIC_URL") %>
-  <% end %>
