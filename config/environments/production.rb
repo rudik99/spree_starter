@@ -24,6 +24,9 @@ Rails.application.configure do
   # Store uploaded files on Cloudflare R2 or local file system (see config/storage.yml for options).
   config.active_storage.service = ENV.fetch('CLOUDFLARE_ENDPOINT', nil).present? ? :cloudflare : :local
 
+  # Serve Active Storage files via redirect (not proxy) for better performance
+  config.active_storage.resolve_model_to_route = :rails_storage_redirect
+
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
 
