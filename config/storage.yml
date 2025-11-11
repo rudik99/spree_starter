@@ -41,5 +41,7 @@ cloudflare:
   region: auto
   bucket: <%= ENV.fetch("CLOUDFLARE_BUCKET", "spree-#{Rails.env}") %>
   public: true
+  # Custom domain for public R2 access - generates direct URLs bypassing Rails
+  public_url: <%= ENV.fetch("CLOUDFLARE_PUBLIC_URL", "https://media.smarthomeiq.com.au") %>
   request_checksum_calculation: "when_required"
   response_checksum_validation: "when_required"
